@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build for macOS (amd64)
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -o lidless-darwin-amd64 ./cmd/lidless
+          tar -czf lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz lidless-darwin-amd64
+
+      - name: Build for macOS (arm64)
+        run: |
+          GOOS=darwin GOARCH=arm64 go build -o lidless-darwin-arm64 ./cmd/lidless
+          tar -czf lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz lidless-darwin-arm64
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
+            lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz
+          body: |
+            ## Installation
+
+            ### Intel Macs (amd64)
+            ```bash
+            curl -L https://github.com/robertarles/lidless/releases/download/${{ steps.get_version.outputs.VERSION }}/lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz | tar xz
+            sudo mv lidless-darwin-amd64 /usr/local/bin/lidless
+            chmod +x /usr/local/bin/lidless
+            ```
+
+            ### Apple Silicon Macs (arm64)
+            ```bash
+            curl -L https://github.com/robertarles/lidless/releases/download/${{ steps.get_version.outputs.VERSION }}/lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz | tar xz
+            sudo mv lidless-darwin-arm64 /usr/local/bin/lidless
+            chmod +x /usr/local/bin/lidless
+            ```
+
+            Then run `lidless` to start the menubar app.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
