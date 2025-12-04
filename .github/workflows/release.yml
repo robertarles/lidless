@@ -26,17 +26,13 @@ jobs:
 
       - name: Build for macOS (amd64)
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o lidless-darwin-amd64 ./cmd/lidless
+          GOARCH=amd64 go build -o lidless-darwin-amd64 ./cmd/lidless
           tar -czf lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz lidless-darwin-amd64
-        env:
-          CGO_ENABLED: 1
 
       - name: Build for macOS (arm64)
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o lidless-darwin-arm64 ./cmd/lidless
+          GOARCH=arm64 go build -o lidless-darwin-arm64 ./cmd/lidless
           tar -czf lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz lidless-darwin-arm64
-        env:
-          CGO_ENABLED: 1
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
