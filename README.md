@@ -15,27 +15,29 @@ Features:
 
 ## Installation
 
-### Download Pre-built Binary (Recommended)
+### Download Pre-built App (Recommended)
 
 Download the latest release for your Mac architecture:
 
 **Intel Macs (amd64):**
 
 ```bash
-curl -L https://github.com/robertarles/lidless/releases/latest/download/lidless-darwin-amd64.tar.gz | tar xz
-sudo mv lidless-darwin-amd64 /usr/local/bin/lidless
-chmod +x /usr/local/bin/lidless
+curl -L https://github.com/robertarles/lidless/releases/latest/download/Lidless-darwin-amd64.zip -o Lidless.zip
+unzip Lidless.zip
+mv Lidless.app /Applications/
 ```
 
 **Apple Silicon Macs (arm64):**
 
 ```bash
-curl -L https://github.com/robertarles/lidless/releases/latest/download/lidless-darwin-arm64.tar.gz | tar xz
-sudo mv lidless-darwin-arm64 /usr/local/bin/lidless
-chmod +x /usr/local/bin/lidless
+curl -L https://github.com/robertarles/lidless/releases/latest/download/Lidless-darwin-arm64.zip -o Lidless.zip
+unzip Lidless.zip
+mv Lidless.app /Applications/
 ```
 
 Or download manually from the [releases page](https://github.com/robertarles/lidless/releases).
+
+> **Note**: On first launch, you may need to right-click the app and select "Open" to bypass Gatekeeper (since the app is not code-signed).
 
 ### Via Go Install
 

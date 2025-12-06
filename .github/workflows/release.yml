@@ -26,39 +26,50 @@ jobs:
 
       - name: Build for macOS (amd64)
         run: |
-          GOARCH=amd64 go build -o lidless-darwin-amd64 ./cmd/lidless
-          tar -czf lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz lidless-darwin-amd64
+          GOARCH=amd64 go build -o build/lidless ./cmd/lidless
+          ./scripts/create-app-bundle.sh build/lidless build
+          cd build && zip -r ../Lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.zip Lidless.app
+          cd .. && rm -rf build
 
       - name: Build for macOS (arm64)
         run: |
-          GOARCH=arm64 go build -o lidless-darwin-arm64 ./cmd/lidless
-          tar -czf lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz lidless-darwin-arm64
+          GOARCH=arm64 go build -o build/lidless ./cmd/lidless
+          ./scripts/create-app-bundle.sh build/lidless build
+          cd build && zip -r ../Lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.zip Lidless.app
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
-            lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz
+            Lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.zip
+            Lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.zip
           body: |
             ## Installation
 
+            Download the appropriate `.zip` for your Mac and extract it.
+
             ### Intel Macs (amd64)
             ```bash
-            curl -L https://github.com/robertarles/lidless/releases/download/${{ steps.get_version.outputs.VERSION }}/lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz | tar xz
-            sudo mv lidless-darwin-amd64 /usr/local/bin/lidless
-            chmod +x /usr/local/bin/lidless
+            curl -L https://github.com/robertarles/lidless/releases/download/${{ steps.get_version.outputs.VERSION }}/Lidless-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.zip -o Lidless.zip
+            unzip Lidless.zip
+            mv Lidless.app /Applications/
             ```
 
             ### Apple Silicon Macs (arm64)
             ```bash
-            curl -L https://github.com/robertarles/lidless/releases/download/${{ steps.get_version.outputs.VERSION }}/lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz | tar xz
-            sudo mv lidless-darwin-arm64 /usr/local/bin/lidless
-            chmod +x /usr/local/bin/lidless
+            curl -L https://github.com/robertarles/lidless/releases/download/${{ steps.get_version.outputs.VERSION }}/Lidless-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.zip -o Lidless.zip
+            unzip Lidless.zip
+            mv Lidless.app /Applications/
             ```
 
-            Then run `lidless` to start the menubar app.
+            Then open Lidless from your Applications folder or run:
+            ```bash
+            open /Applications/Lidless.app
+            ```
+
+            > **Note**: On first launch, you may need to right-click the app and select "Open" to bypass Gatekeeper (since the app is not code-signed).
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
